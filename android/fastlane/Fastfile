@@ -1,5 +1,6 @@
 platform :android do
   desc "Build and deploy the Android app to Google Play"
+  package_name "com.ipcian.rn"
   lane :deploy do
     # Google Play로 앱 배포
     supply(
