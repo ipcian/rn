@@ -22,7 +22,7 @@ permissions:
 jobs:
   android-build:
     name: Build & Deploy Android
-    runs-on: macos-latest-large
+    runs-on: macos-15-xlarge
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
