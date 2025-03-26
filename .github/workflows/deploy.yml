@@ -70,12 +70,17 @@ jobs:
           SUPPLY_JSON_KEY: ${{ secrets.SUPPLY_JSON_KEY }}
 
       - name: Debug JSON Key File
-        run: ls -l supply.json  # 파일이 제대로 생성되었는지 확인
+        run: |
+          ls -l supply.json
+          cat supply.json  # JSON 파일 내용 확인 (테스트용)
+
+      - name: Set Environment Variable
+        run: echo "SUPPLY_JSON_KEY_FILE=$(pwd)/supply.json" >> $GITHUB_ENV
 
       - name: Run Fastlane
         run: fastlane supply --track production --aab android/app/build/outputs/bundle/release/app-release.aab
         env:
-          SUPPLY_JSON_KEY_FILE: supply.json
+          SUPPLY_JSON_KEY_FILE: $(pwd)/supply.json
 
 
   ios-build:
