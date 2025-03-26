@@ -3,7 +3,7 @@ platform :android do
   lane :deploy do
     # Google Play로 앱 배포
     supply(
-      track: "production", # 배포 트랙: production, beta, internal
+      track: "internal", # 배포 트랙: production, beta, internal
       package_name: "com.ipcian.rn", # 앱 패키지 이름
       aab: "./app/build/outputs/bundle/release/app-release.aab" # 빌드된 AAB 파일 경로
     )
