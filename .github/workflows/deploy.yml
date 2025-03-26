@@ -16,10 +16,13 @@ env:
   SUPPLY_JSON_KEY: ${{ secrets.GOOGLE_PLAY_KEY }}
   GITHUB_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
 
+permissions:
+  contents: write  # ✅ 권한 추가
+
 jobs:
   android-build:
     name: Build & Deploy Android
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-8-cores
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
