@@ -72,6 +72,13 @@ jobs:
       - name: Set Environment Variable
         run: echo "SUPPLY_JSON_KEY_FILE=$(pwd)/supply.json" >> $GITHUB_ENV
 
+      - name: Debug JSON Key File
+        run: |
+          echo "Checking if supply.json exists..."
+          ls -l $(pwd)/supply.json
+          echo "Checking environment variable..."
+          echo $SUPPLY_JSON_KEY_FILE
+
       - name: Run Fastlane
         run: | 
          fastlane supply init
