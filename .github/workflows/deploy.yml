@@ -75,7 +75,7 @@ jobs:
       - name: Run Fastlane
         run: | 
          fastlane supply init
-         fastlane supply --track production --aab android/app/build/outputs/bundle/release/app-release.aab
+         fastlane supply --track internal --aab android/app/build/outputs/bundle/release/app-release.aab
         env:
           SUPPLY_JSON_KEY_FILE: $(pwd)/supply.json
 
