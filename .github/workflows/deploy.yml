@@ -13,7 +13,7 @@ env:
   ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
   ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
   ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-  SUPPLY_JSON_KEY: ${{ secrets.SUPPLY_JSON_KEY }}
+
   APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
   APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
   APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
@@ -66,8 +66,13 @@ jobs:
 
       - name: Decode SUPPLY_JSON_KEY and save to file
         run: echo "$SUPPLY_JSON_KEY" | base64 --decode > supply.json
+        env:
+          SUPPLY_JSON_KEY: ${{ secrets.SUPPLY_JSON_KEY }}
 
-      - name: Upload to Google Play
+      - name: Debug JSON Key File
+        run: ls -l supply.json  # 파일이 제대로 생성되었는지 확인
+
+      - name: Run Fastlane
         run: fastlane supply --track production --aab android/app/build/outputs/bundle/release/app-release.aab
         env:
           SUPPLY_JSON_KEY_FILE: supply.json
