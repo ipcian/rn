@@ -69,10 +69,6 @@ jobs:
         env:
           SUPPLY_JSON_KEY: ${{ secrets.SUPPLY_JSON_KEY }}
 
-      - name: Debug JSON Key File
-        run: |
-          ls -l supply.json
-
       - name: Set Environment Variable
         run: echo "SUPPLY_JSON_KEY_FILE=$(pwd)/supply.json" >> $GITHUB_ENV
 
