@@ -1,0 +1,105 @@
+name: React Native CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  android-build:
+    name: Build & Deploy Android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Setup Java & Gradle
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Decode Keystore
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      - name: Create Gradle Properties
+        run: |
+          echo "MYAPP_UPLOAD_STORE_FILE=keystore.jks" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/gradle.properties
+
+      - name: Build APK
+        run: |
+          cd android
+          ./gradlew assembleRelease
+
+      - name: Build AAB
+        run: |
+          cd android
+          ./gradlew bundleRelease
+
+      - name: Upload APK to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          files: android/app/build/outputs/apk/release/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  ios-build:
+    name: Build & Deploy iOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      - name: Setup Match
+        run: |
+          echo "${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}" | base64 --decode > AuthKey.p8
+          fastlane match appstore --readonly
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+      - name: Build iOS App
+        run: |
+          cd ios
+          xcodebuild -workspace YourProject.xcworkspace \
+            -scheme YourScheme \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $PWD/build/YourProject.xcarchive archive
+          xcodebuild -exportArchive \
+            -archivePath $PWD/build/YourProject.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath $PWD/build
+
+      - name: Upload to TestFlight
+        run: fastlane pilot upload --ipa ios/build/YourApp.ipa
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
