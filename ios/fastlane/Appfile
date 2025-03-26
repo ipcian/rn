@@ -1,0 +1,5 @@
+default_platform(:ios)
+
+app_identifier("com.ipcian.rn") # iOS 번들 ID
+apple_id("newbieber@icloud.com")        # Apple 계정 이메일
+team_id("WUSK76W95Q")                 # Apple Developer 계정의 팀 ID

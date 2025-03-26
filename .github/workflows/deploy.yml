@@ -8,6 +8,14 @@ on:
     branches:
       - main
 
+env:
+  ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+  ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+  ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+  ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+  SUPPLY_JSON_KEY: ${{ secrets.GOOGLE_PLAY_KEY }}
+  GITHUB_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
+
 jobs:
   android-build:
     name: Build & Deploy Android
@@ -31,12 +39,6 @@ jobs:
           java-version: '17'
 
       - name: Decode Keystore
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
         run: echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
 
       - name: Create Gradle Properties
@@ -52,12 +54,13 @@ jobs:
           ./gradlew bundleRelease
           echo "aab 파일 완성"
 
-      - name: Upload APK to GitHub Releases
-        uses: softprops/action-gh-release@v1
-        with:
-          files: android/app/build/outputs/apk/release/app-release.aab
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Fastlane
+        run: gem install fastlane
+
+      - name: Upload to Google Play
+        run: fastlane supply --track production --aab android/app/build/outputs/bundle/release/app-release.aab
+
+
 
   ios-build:
     name: Build & Deploy iOS

@@ -1,0 +1,19 @@
+platform :ios do
+  desc "Build and upload the iOS app to TestFlight"
+  lane :deploy do
+    # 코드 서명 인증서를 설정 (Fastlane Match와 연동)
+    match(
+      type: "appstore", # 코드 서명 설정 (appstore/testflight)
+      app_identifier: "com.ipcian.rn" # 앱 번들 ID
+    )
+
+    # iOS 빌드
+    build_app(
+      workspace: "rn.xcworkspace", # 워크스페이스 경로
+      scheme: "Archive"         # 빌드 Scheme
+    )
+
+    # TestFlight 업로드
+    upload_to_testflight
+  end
+end
