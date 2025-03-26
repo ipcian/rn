@@ -68,9 +68,9 @@ jobs:
         run: echo "$SUPPLY_JSON_KEY" | base64 --decode > supply.json
 
       - name: Upload to Google Play
-        run: export SUPPLY_JSON_KEY_FILE="supply.json"
-          fastlane supply --track production --aab android/app/build/outputs/bundle/release/app-release.aab
-
+        run: fastlane supply --track production --aab android/app/build/outputs/bundle/release/app-release.aab
+        env:
+          SUPPLY_JSON_KEY_FILE: supply.json
 
 
   ios-build:
