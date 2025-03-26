@@ -60,8 +60,11 @@ jobs:
       - name: Setup Fastlane
         run: gem install fastlane --user-install
 
+      - name: Decode SUPPLY_JSON_KEY and save to file
+        run: echo "$SUPPLY_JSON_KEY" | base64 --decode > supply.json
+
       - name: Upload to Google Play
-        run: fastlane supply --track production --aab android/app/build/outputs/bundle/release/app-release.aab
+        run: fastlane --json_key supply.json supply --track production --aab android/app/build/outputs/bundle/release/app-release.aab
 
 
 
