@@ -58,7 +58,7 @@ jobs:
           echo "aab 파일 완성"
 
       - name: Setup Fastlane
-        run: gem install fastlane
+        run: gem install fastlane --user-install
 
       - name: Upload to Google Play
         run: fastlane supply --track production --aab android/app/build/outputs/bundle/release/app-release.aab
