@@ -74,11 +74,15 @@ jobs:
           echo "$SUPPLY_JSON_KEY" | base64 --decode > android/supply.json
           set -x
 
+      - name: Set Environment Variable
+        run: echo "SUPPLY_JSON_KEY=./supply.json" >> $GITHUB_ENV
+
       - name: Run Fastlane
         run: | 
           cd android
           fastlane supply init
           fastlane supply --track internal --aab android/app/build/outputs/bundle/release/app-release.aab
+
 
   ios-build:
     name: Build & Deploy iOS
