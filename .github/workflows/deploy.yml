@@ -81,7 +81,7 @@ jobs:
         run: |
           cd android
           if ! fastlane supply init ; then echo "fastlane supply init failed, continuing..."; fi
-          if ! fastlane supply --track internal --release-status --aab app/build/outputs/bundle/release/app-release.aab ; then echo "fastlane supply upload failed, continuing..."; fi
+          if ! fastlane supply --track internal --release-status draft --aab app/build/outputs/bundle/release/app-release.aab ; then echo "fastlane supply upload failed, continuing..."; fi
 
   ios-build:
     name: Build & Deploy iOS
