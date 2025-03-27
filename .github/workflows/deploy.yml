@@ -13,7 +13,7 @@ env:
   ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
   ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
   ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-
+  SUPPLY_JSON_KEY: ${{ secrets.SUPPLY_JSON_KEY }}
   APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
   APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
   APP_STORE_CONNECT_API_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_API_PRIVATE_KEY }}
@@ -45,8 +45,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Decode Keystore
-        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
+      - name: Decode Keystore (Android)
+        run: |
+          set +x
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
+          set -x
+      
 
       - name: Create Gradle Properties
         run: |
@@ -64,21 +68,17 @@ jobs:
       - name: Setup Fastlane
         run: gem install fastlane --user-install
 
-      - name: Decode SUPPLY_JSON_KEY and save to file
-        run: echo "$SUPPLY_JSON_KEY" | base64 --decode > supply.json
-        env:
-          SUPPLY_JSON_KEY: ${{ secrets.SUPPLY_JSON_KEY }}
-
-      - name: Set Environment Variable
-        run: echo "SUPPLY_JSON_KEY=$(pwd)/supply.json" >> $GITHUB_ENV
+      - name: Decode SUPPLY_JSON_KEY (Fastlane)
+        run: |
+          set +x
+          echo "$SUPPLY_JSON_KEY" | base64 --decode > android/supply.json
+          set -x
 
       - name: Run Fastlane
         run: | 
-         fastlane supply init -p com.ipcian.rn
-         fastlane supply --track internal --aab android/app/build/outputs/bundle/release/app-release.aab
-        env:
-          SUPPLY_JSON_KEY_FILE: $(pwd)/supply.json
-
+          cd android
+          fastlane supply init
+          fastlane supply --track internal --aab android/app/build/outputs/bundle/release/app-release.aab
 
   ios-build:
     name: Build & Deploy iOS
