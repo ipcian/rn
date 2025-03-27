@@ -59,6 +59,14 @@ jobs:
           echo "MYAPP_UPLOAD_STORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=$ANDROID_KEY_PASSWORD" >> android/gradle.properties
 
+      - name: Version Update
+        run: |
+          awk '/versionCode/{sub($2, $2+1)}1' android/app/build.gradle > temp && mv temp android/app/build.gradle
+          echo "Updated versionCode in build.gradle"
+          git add android/app/build.gradle
+          git commit -m 'build for versionCode plus 1'
+          git push
+
       - name: Build AAB
         run: |
           cd android
