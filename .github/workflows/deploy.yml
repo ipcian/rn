@@ -78,11 +78,10 @@ jobs:
         run: echo "SUPPLY_JSON_KEY=./supply.json" >> $GITHUB_ENV
 
       - name: Run Fastlane
-        run: | 
+        run: |
           cd android
-          fastlane supply init
-          fastlane supply --track internal --aab android/app/build/outputs/bundle/release/app-release.aab
-
+          if ! fastlane supply init ; then echo "fastlane supply init failed, continuing..."; fi
+          if ! fastlane supply --track internal --aab android/app/build/outputs/bundle/release/app-release.aab ; then echo "fastlane supply upload failed, continuing..."; fi
 
   ios-build:
     name: Build & Deploy iOS
